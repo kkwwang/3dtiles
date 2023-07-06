@@ -1,0 +1,27 @@
+FROM hub.threedns.io/three-platform/3dtiles-cargo:latest
+WORKDIR /tem
+
+RUN cp -a /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
+RUN curl -O /etc/yum.repos.d/CentOS-Base.repo https://repo.huaweicloud.com/repository/conf/CentOS-7-reg.repo
+RUN yum -y update
+
+RUN yum install -y git \
+mesa-libGL-devel \
+mesa-libGLU-devel \
+freeglut-devel \
+gcc \
+gcc-c++ \
+libjpeg
+
+RUN yum install -y epel-release
+RUN yum install -y gdal-python  gdal-devel  gdal-libs  gdal-perl  gdal
+
+RUN git clone -b linux_osg_370 https://gitee.com/kiilin/3dtiles.git
+COPY --from=hub.threedns.io/three-platform/3dtiles-osg:latest /tem/OpenSceneGraph/lib/ ./3dtiles/lib/
+
+RUN cd 3dtiles && cargo build --release
+ENV PATH "/tem/3dtiles/target/release:${PATH}"
+ENV LD_LIBRARY_PATH "./3dtiles/lib"
+
+RUN ln -s /tem/3dtiles/target/release/_3dtile /tem/3dtiles/target/release/3dtile
+

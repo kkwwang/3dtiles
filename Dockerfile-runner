@@ -1,0 +1,12 @@
+FROM centos:7.3.1611
+WORKDIR /tem
+
+COPY --from=hub.threedns.io/three-platform/3dtiles-build:latest /tem/3dtiles/target/release/_3dtile /tem/3dtiles/
+COPY --from=hub.threedns.io/three-platform/3dtiles-build:latest /tem/3dtiles/lib /tem/3dtiles/lib/
+
+RUN ln -s /tem/3dtiles/_3dtile /tem/3dtiles/3dtile
+ENV PATH "/tem/3dtiles:${PATH}"
+ENV LD_LIBRARY_PATH "./3dtiles/lib"
+
+RUN yum install -y epel-release
+RUN yum install -y gdal mesa-libGL-devel

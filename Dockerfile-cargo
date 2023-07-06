@@ -1,0 +1,7 @@
+FROM centos:7.3.1611
+
+ENV RUSTUP_DIST_SERVER https://mirror.sjtu.edu.cn/rust-static
+ENV RUSTUP_UPDATE_ROOT https://mirror.sjtu.edu.cn/rust-static/rustup
+
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"

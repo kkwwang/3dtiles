@@ -1,0 +1,12 @@
+FROM centos:7.3.1611
+WORKDIR /tem
+
+RUN cp -a /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
+RUN curl -O /etc/yum.repos.d/CentOS-Base.repo https://repo.huaweicloud.com/repository/conf/CentOS-7-reg.repo
+RUN yum -y update
+
+RUN yum install -y epel-release
+RUN yum install -y git make cmake3 gcc gcc-c++ mesa-libGL-devel mesa-libGLU-devel freeglut-devel libjpeg
+
+RUN git clone https://gitee.com/kiilin/OpenSceneGraph.git
+RUN cd OpenSceneGraph && cmake3 . && make && make install

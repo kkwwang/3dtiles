@@ -1,7 +1,9 @@
-#ifdef _WIN32
+//#ifdef _WIN32
+// #include <gdal/ogr_spatialref.h>
+// #include <gdal/ogrsf_frmts.h>
 #include <gdal/ogr_spatialref.h>
 #include <gdal/ogrsf_frmts.h>
-#endif
+//#endif
 
 #include <cmath>
 #include <vector>
@@ -14,9 +16,10 @@
 ///////////////////////
 static const double pi = std::acos(-1);
 
-#ifdef _WIN32
+//#ifdef _WIN32
 extern "C" bool epsg_convert(int insrs, double* val, char* path) {
-    CPLSetConfigOption("GDAL_DATA", path);
+    //改为从os环境变量获取
+    // CPLSetConfigOption("GDAL_DATA", path);
     OGRSpatialReference inRs,outRs;
     inRs.importFromEPSG(insrs);
     outRs.importFromEPSG(4326);
@@ -29,10 +32,11 @@ extern "C" bool epsg_convert(int insrs, double* val, char* path) {
         delete poCT;
     }
     return false;
-} 
+}
 
 extern "C" bool wkt_convert(char* wkt, double* val, char* path) {
-    CPLSetConfigOption("GDAL_DATA", path);
+    // 改为从os环境变量获取
+    // CPLSetConfigOption("GDAL_DATA", path);
     OGRSpatialReference inRs,outRs;
     inRs.importFromWkt(&wkt);
     outRs.importFromEPSG(4326);
@@ -47,20 +51,20 @@ extern "C" bool wkt_convert(char* wkt, double* val, char* path) {
     return false;
 }
 
-#else
-extern "C" bool
-epsg_convert(int insrs, double* val, char* path)
-{
-    return false;
-}
-
-extern "C" bool
-wkt_convert(char* wkt, double* val, char* path)
-{
-    return false;
-}
-
-#endif
+// #else
+// extern "C" bool
+// epsg_convert(int insrs, double* val, char* path)
+// {
+//     return false;
+// }
+//
+// extern "C" bool
+// wkt_convert(char* wkt, double* val, char* path)
+// {
+//     return false;
+// }
+//
+// #endif
 
 extern "C"
 {
@@ -102,7 +106,7 @@ std::vector<double> transfrom_xyz(double radian_x, double radian_y, double heigh
     double px = x0 / gamma;
     double py = y0 / gamma;
     double pz = z0 / gamma;
-    
+
     double dx = xn * height_min;
     double dy = yn * height_min;
     double dz = zn * height_min;
@@ -114,13 +118,13 @@ std::vector<double> transfrom_xyz(double radian_x, double radian_y, double heigh
         (x0*east_mat[1] - east_mat[0]*y0)
     };
     double east_normal = std::sqrt(
-        east_mat[0]*east_mat[0] + 
-        east_mat[1]*east_mat[1] + 
+        east_mat[0]*east_mat[0] +
+        east_mat[1]*east_mat[1] +
         east_mat[2]*east_mat[2]
         );
     double north_normal = std::sqrt(
-        north_mat[0]*north_mat[0] + 
-        north_mat[1]*north_mat[1] + 
+        north_mat[0]*north_mat[0] +
+        north_mat[1]*north_mat[1] +
         north_mat[2]*north_mat[2]
         );
 
@@ -152,8 +156,8 @@ extern "C" void transform_c(double center_x, double center_y, double height_min,
     std::memcpy(ptr, v.data(), v.size() * 8);
 }
 
-bool write_tileset_box( 
-    Transform* trans, Box& box,     
+bool write_tileset_box(
+    Transform* trans, Box& box,
     double geometricError,
     const char* b3dm_file,
     const char* json_file) {
@@ -202,11 +206,11 @@ bool write_tileset_box(
 }
 
 bool write_tileset_region(
-    Transform* trans, 
+    Transform* trans,
     Region& region,
     double geometricError,
     const char* b3dm_file,
-    const char* json_file) 
+    const char* json_file)
 {
     std::vector<double> matrix;
     if (trans) {
@@ -254,8 +258,8 @@ bool write_tileset_region(
 
 /***/
 bool write_tileset(
-    double radian_x, double radian_y, 
-    double tile_w, double tile_h, 
+    double radian_x, double radian_y,
+    double tile_w, double tile_h,
     double height_min, double height_max,
     double geometricError,
     const char* filename, const char* full_path)
@@ -288,13 +292,13 @@ bool write_tileset(
         (x0*east_mat[1] - east_mat[0]*y0)
     };
     double east_normal = std::sqrt(
-        east_mat[0]*east_mat[0] + 
-        east_mat[1]*east_mat[1] + 
+        east_mat[0]*east_mat[0] +
+        east_mat[1]*east_mat[1] +
         east_mat[2]*east_mat[2]
         );
     double north_normal = std::sqrt(
-        north_mat[0]*north_mat[0] + 
-        north_mat[1]*north_mat[1] + 
+        north_mat[0]*north_mat[0] +
+        north_mat[1]*north_mat[1] +
         north_mat[2]*north_mat[2]
         );
 
